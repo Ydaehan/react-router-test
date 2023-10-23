@@ -1,7 +1,7 @@
 import React from 'react';
 
-export default function Main() {
+export default function TravelForm() {
   return (<div className='container mt-5'>
-    <h3>Main Page!</h3>
+    <h3>Travel Form@</h3>
   </div>);
 }
