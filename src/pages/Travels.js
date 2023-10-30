@@ -7,6 +7,12 @@ import Travel from '../components/Travel';
 //   {id:'3', name: '일본', imglink:'https://cdn.pixabay.com/photo/2014/10/07/13/48/mountain-477832_1280.jpg'},
 // ];
 
+const exptravels = [
+  {id:'1', name: 'korea', imglink:'https://cdn.pixabay.com/photo/2020/08/09/11/31/business-5475283_1280.jpg'},
+  {id:'2', name: 'america', imglink:'https://cdn.pixabay.com/photo/2014/02/17/10/20/statue-of-liberty-267948_1280.jpg'},
+  {id:'3', name: 'japan', imglink:'https://cdn.pixabay.com/photo/2014/10/07/13/48/mountain-477832_1280.jpg'},
+]
+
 
 export default function Travels() {
   const [visibility, setVisibility] = useState(false);
@@ -44,3 +50,5 @@ export default function Travels() {
   </div>
   );
 }
+
+export { exptravels};
