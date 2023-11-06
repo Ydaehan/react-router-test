@@ -1,74 +1,250 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 // import "./TravelForm.css";
-import styles from './TravelForm.module.css';
-import Travels, { exptravels } from './Travels';
+import styles from "./TravelForm.module.css";
+// import Travels, {exptravels} from './Travels';
 
 export default function TravelForm() {
-  return (<div className='container mt-2'>
-    {/* container는 내부에 내용을 포함한다는 의미
-        mt: margin top */}
-    <h3>Travel Form 페이지</h3>
-    <hr />
-    {/* <form action="">
-      <p><input type="text" className={styles.inputBox} name="name" placeholder='여행지 국가이름' autoComplete='off'/></p>
-      <p><input type="text" className={styles.inputBox} name="image" placeholder='여행지 대표이미지' autoComplete='off'/></p>
-    </form> */}
-    <form>
-      <div className='input-group input-group-lg mb-2'>
-        {/* lg: large mb: margin-bottom */}
-        <span className='input-group-text'>인덱스번호</span>
-        <input className='form-control' type="text" />
-      </div>
-      <div className='input-group input-group-lg mb-2'>
-        {/* lg: large mb: margin-bottom */}
-        <span className='input-group-text'>여행지 국가</span>
-        <input className='form-control' type="text" />
-      </div>
-      <div className='input-group input-group-lg mb-2'>
-        {/* lg: large mb: margin-bottom */}
-        <span className='input-group-text'>대표이미지</span>
-        <input className='form-control' type="text" />
-      </div>
-      <input type="submit" className='btn btn-dark' value='여행정보입력' />
+  const UpdateForm = ({ uTravels }) => {
+    return (
+      <>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const id = e.target.id.value;
+            const name = e.target.name.value;
+            const image = e.target.image.value;
+
+            const newTravels = [...travels];
+            const updateArticle = {
+              id: id,
+              name: name,
+              imglink: image,
+            };
+
+            newTravels.map((t) =>
+              t.id === id ? (newTravels[t.id - 1] = updateArticle) : t
+            );
+
+            fetch(`http://localhost:3100/travel/${id}`, {
+              method: "PATCH",
+              headers: { "Content-type": "application/json" },
+              body: JSON.stringify(updateArticle),
+            }).then((response) => {
+              console.log(response);
+            });
+            setTravels(newTravels);
+            setModifyMode(!modifyMode);
+          }}
+        >
+          <div className="input-group inputGroup-lg mb-2">
+            <span className="input-group-text">인덱스 번호</span>
+            <input
+              type="text"
+              className="form-control"
+              name="id"
+              autoComplete="off"
+              defaultValue={uTravels.id}
+            />
+          </div>
+          <div className="input-group inputGroup-lg mb-2">
+            <span className="input-group-text">여행지 국가</span>
+            <input
+              type="text"
+              className="form-control"
+              name="name"
+              autoComplete="off"
+              defaultValue={uTravels.name}
+            />
+          </div>
+          <div className="input-group inputGroup-lg mb-2">
+            <span className="input-group-text">대표 이미지</span>
+            <input
+              type="text"
+              className="form-control"
+              name="image"
+              autoComplete="off"
+              defaultValue={uTravels.image}
+            />
+          </div>
+          <p>
+            <img src={uTravels.image} width='100%' />
+          </p>
+          <input type="submit" className="btn btn-dark" value="정보 수정" />
+          <div style={{ border: "1px solid blue", position: "relative" }}>
+            <button
+              className="btn btn-outline-info"
+              style={{ position: "absolute", top: "-38px", right: "0px", border: '1px solid red' }}
+              onClick={() => {
+                setModifyMode(!modifyMode);
+              }}
+            >
+              뒤돌아가기
+            </button>
+          </div>
+        </form>
+      </>
+    );
+  };
+
+  const [travels, setTravels] = useState([]);
+  const [modifyMode, setModifyMode] = useState(false);
+  const [inputUpdateData, setInputUpdateData] = useState({
+    id: "",
+    name: "",
+    image: "",
+  });
+  useEffect(() => {
+    fetch("http://localhost:3100/travel")
+      .then((response) => response.json())
+      .then((jsonData) => setTravels([...jsonData]));
+  }, [modifyMode]);
+
+  const clickHandlerModify = (data, event) => {
+    // 수정화면의 input 태그 값 세팅
+    event.preventDefault();
+
+    console.log(data, event);
+    // Update 구현, 화면변경 아직
+
+    setInputUpdateData({
+      id: data.id,
+      name: data.name,
+      image: data.imglink,
+    });
+
+    setModifyMode(!modifyMode);
+  };
+
+  return (
+    <div className="container mt-5">
+      <h3>Travel Form 페이지</h3>
       <hr />
-      {console.log(exptravels)}
-      <ul style={{listStyle:'none', paddingLeft: '40px'}}>
-        {
-          exptravels.map(
-            (t)=>(
-              <li key={t.id}>
-                <span style={{display:'inline-block', width:'140px'}}>
+
+      {!modifyMode ? (
+        <form
+          className={styles}
+          onSubmit={(event) => {
+            event.preventDefault(); // reload 방지
+            const id = event.target.id.value;
+            const name = event.target.name.value;
+            const image = event.target.image.value;
+            console.log(id, name, image);
+
+            const newArticle = {
+              id, // key명과 value의 변수명이 같으면 생략가능
+              name,
+              imglink: image,
+            };
+
+            fetch("http://localhost:3100/travel", {
+              method: "POST",
+              headers: { "Content-type": "application/json" },
+
+              body: JSON.stringify(newArticle),
+            }).then((response) => {
+              console.log(response);
+            });
+
+            setTravels([...travels, newArticle]);
+
+            event.target.reset();
+          }}
+        >
+          <div>
+            <span className="input-group-text">인덱스 번호</span>
+            <input
+              type="text"
+              className="form-control"
+              name="id"
+              autoComplete="off"
+            />
+          </div>
+          <div>
+            <span className="input-group-text">여행지 국가</span>
+            <input
+              type="text"
+              className="form-control"
+              name="name"
+              autoComplete="off"
+            />
+          </div>
+          <div>
+            <span className="input-group-text">대표 이미지</span>
+            <input
+              type="text"
+              className="form-control"
+              name="image"
+              autoComplete="off"
+            />
+          </div>
+          <input
+            type="submit"
+            className="btn btn-dark"
+            value="여행지 정보 입력"
+          />
+          <hr />
+
+          <ul style={{ listStyle: "none", padding: "40px" }}>
+            {travels.map((t) => (
+              <li key={t.id} style={{ position: "relative" }}>
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "140px",
+                    textTransform: "capitalize",
+                  }}
+                >
                   {t.id}.
                 </span>
-                <span style={{display:'inline-block', width:'140px', fontWeight: 'bold', marginBottom: '70px', textTransform: 'capitalize'}}>{t.name}</span>
-                <img height='140px' width='30%' src={t.imglink} alt="" />
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "140px",
+                    marginBottom: "70px",
+                    textTransform: "capitalize",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {t.name}
+                </span>
+                <img height="140px" width="30%" src={t.imglink} alt="" />
+                <div>
+                  <button
+                    className="btn btn-outline-success"
+                    style={{
+                      position: "absolute",
+                      top: "50px",
+                      right: "100px",
+                      zIndex: "2",
+                    }}
+                    onClick={(ev) => {
+                      clickHandlerModify(t, ev);
+                    }}
+                  >
+                    수정
+                  </button>
+                  <button
+                    className="btn btn-outline-danger"
+                    style={{
+                      position: "absolute",
+                      top: "50px",
+                      right: "24px",
+                      zIndex: "1",
+                    }}
+                  >
+                    삭제
+                  </button>
+                </div>
               </li>
-            )
-          )
-        }
-      </ul>
-      {/* <ul style={{listStyle:'none'}}>
-        <li>
-          <span style={{display:'inline-block', width:'140px'}}>
-            1.&nbsp;
-          </span>
-          <span style={{display:'inline-block', width:'140px', fontWeight: 'bold'}}>
-            korea
-
-          </span>
-          <img width='30%' src="https://cdn.pixabay.com/photo/2020/08/09/11/31/business-5475283_1280.jpg" alt="" />
-        </li>
-        <li>
-          <span style={{display:'inline-block', width:'140px'}}>
-            2.&nbsp;
-          </span>
-          <span style={{display:'inline-block', width:'140px', fontWeight: 'bold'}}>
-            America
-
-          </span>
-          <img width='30%' src="https://cdn.pixabay.com/photo/2014/02/17/10/20/statue-of-liberty-267948_1280.jpg" alt="" />
-        </li>
-      </ul> */}
-    </form>
-  </div>);
+            ))}
+          </ul>
+        </form>
+      ) : (
+        <>
+          <h1>UpdateMode</h1>
+          <UpdateForm uTravels={inputUpdateData} />
+        </>
+      )}
+    </div>
+  );
 }
