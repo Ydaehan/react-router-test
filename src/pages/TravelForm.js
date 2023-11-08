@@ -34,7 +34,8 @@ export default function TravelForm() {
             });
             setTravels(newTravels);
             setModifyMode(!modifyMode);
-          }}
+          }
+          }
         >
           <div className="input-group inputGroup-lg mb-2">
             <span className="input-group-text">인덱스 번호</span>
@@ -98,6 +99,29 @@ export default function TravelForm() {
       .then((response) => response.json())
       .then((jsonData) => setTravels([...jsonData]));
   }, [modifyMode]);
+
+  const onDelete = (ev, data) => {
+    console.log('Delete')
+    console.log('삭제ID', data)
+  }
+  // 삭제처리
+  // 1. fetch로 삭제처리
+  // fetch(`http://localhost:3100/travel/${data}`, {
+  //   method: "DELETE",
+  //   headers: { "Content-type": "application/json" },
+  //   body: JSON.stringify(updateArticle),
+  // }).then((response) => {
+  //   // console.log(response);
+  // });
+  setTravels(
+    travels.filter(
+      t => t.id != data // 람다식과 유사
+      // (t) => t.id !== data
+      // (t) => {return t.id !== data;}
+    )
+  )
+
+  // 2. travels에 filter함수 활용
 
   const clickHandlerModify = (data, event) => {
     // 수정화면의 input 태그 값 세팅
@@ -218,7 +242,7 @@ export default function TravelForm() {
                       zIndex: "2",
                     }}
                     onClick={(ev) => {
-                      clickHandlerModify(t, ev);
+                      clickHandlerModify(t.id, ev);
                     }}
                   >
                     수정
